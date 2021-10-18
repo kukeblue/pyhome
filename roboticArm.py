@@ -9,13 +9,13 @@ class RoboticArm:
 
     def __init__(self):
         print("- RoboticArm: 初始化机器臂🙌 ...")
-        self.initMhWindow()
 
     def initMhWindow(self):
         self.mhWindow = MHWindow()
         print('- RoboticArm: 初始化梦幻窗口💕 ...')
-        self.mhWindow.run()
 
+    def start(self):
+        self.mhWindow.start()
 
 class MHWindow(threading.Thread):
     hwnd = None
@@ -28,22 +28,30 @@ class MHWindow(threading.Thread):
     mouseX = 0
     mouseY = 0
     isMouseOut = False
+    userServices = []
 
     def __init__(self):
         self.getWindowInfo()
         threading.Thread.__init__(self)
 
     def run(self):
+        for service in self.userServices:
+            service(self)
         while True:
+            self.getWindowInfo()
+            self.getMousePosition()
+            # self.checkpoint()
             if self.windowTitle == '':
                 print('未找到游戏...')
                 time.sleep(10)
                 continue
-            print("窗口：", self.windowTitle, '位置：', self.windowLeftLocation, self.windowTopLocation, '分辨率：',  self.width,
-                  self.height)
-            time.sleep(1)
-            self.getWindowInfo()
-            self.getMousePosition()
+            time.sleep(3)
+
+    def addService(self, callback):
+        self.userServices.append(callback)
+
+    def getImagePosition(self):
+        print('获取图片位置')
 
     def getMousePosition(self):
         x, y = pyautogui.position()
@@ -75,3 +83,26 @@ class MHWindow(threading.Thread):
                 self.windowLeftLocation = left
 
         win32gui.EnumWindows(get_all_hwnd, 0)
+
+    def moveInWindow(self, x, y):
+        pyautogui.moveTo(self.windowLeftLocation + x, self.windowTopLocation + y)
+
+    def resetMove(self):
+        self.moveInWindow(self.width / 2, self.height / 2)
+        pyautogui.leftClick()
+
+    def resetMove2(self):
+        self.moveInWindow(self.width / 2, self.height / 3 * 2 )
+        pyautogui.leftClick()
+
+    def automaticPathfinding(self):
+        self.resetMove()
+        pyautogui.press('tab')
+
+    def checkpoint(self):
+        jiantou = pyautogui.locateOnScreen('./images/jiantou.png', region=(self.windowLeftLocation, self.windowTopLocation, self.width, self.height), confidence=0.8)
+        if jiantou == None:
+            self.resetMove()
+
+
+

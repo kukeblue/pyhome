@@ -1,5 +1,5 @@
-from gwindow.mhWindow import MHWindow
-from gwindow.eventGetZgTask import eventGetZgTask
+from gwindow.mhWindow import MHWindow, MHEvent
+from gwindow.eventGetZgTask import EventZgTask
 from gwindow.serviceTjJJHS import serviceTjJJHS
 
 
@@ -12,7 +12,8 @@ class Robot:
     def initMhWindow(self):
         self.mhWindow = MHWindow()
         # 注册抓鬼事件
-        self.mhWindow.addEvent('zgTask', eventGetZgTask)
+        zgTaskEvent = MHEvent(EventZgTask)
+        self.mhWindow.addEvent('zgTask', zgTaskEvent)
         self.mhWindow.addService('zdJJHS', serviceTjJJHS)
         print('- RoboticArm: 初始化梦幻窗口💕 ...')
 

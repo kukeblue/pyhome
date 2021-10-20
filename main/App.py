@@ -28,16 +28,21 @@ async def getZgTask(request):
     myRobot.mhWindow.doEvent('zgTask')
     return json({'success': 'true'})
 
+@app.route('/api/mh/stopZgTask')
+async def stopZgTask(request):
+    myRobot.mhWindow.userEvent.get('zgTask').status = 2
+    return json({'success': 'true'})
+
 
 @app.route('/api/mh/startServiceTjJJHS')
-async def getZgTask(request):
+async def startServiceTjJJHS(request):
     myRobot.mhWindow.resetMove()
     myRobot.mhWindow.userServices['zdJJHS'].status = 1
     return json({'success': 'true'})
 
 
 @app.route('/api/mh/stopServiceTjJJHS')
-async def getZgTask(request):
+async def stopServiceTjJJHS(request):
     myRobot.mhWindow.resetMove()
     myRobot.mhWindow.userServices['zdJJHS'].status = 0
     return json({'success': 'true'})

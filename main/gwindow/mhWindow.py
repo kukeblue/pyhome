@@ -48,6 +48,14 @@ class MHWindow(threading.Thread):
                     v.status = 2
                 if v.status == 2:
                     v.call(self)
+            # 循环事件
+            for k, v in self.userEvent.items():
+                if v.status == 2 and v.instance is not None:
+                    v.instance.raise_exception()
+                    v.instance.join()
+                    v.instance = None
+                    v.status = 0
+
             time.sleep(1)
 
     # 注册服务
@@ -64,17 +72,16 @@ class MHWindow(threading.Thread):
 
     # 注册事件
     def addEvent(self, name, event):
-        event.self = self
+        event.mhWindow = self
         self.userEvent[name] = event
 
     def doEvent(self, name):
-        mhWindowLog('开始执行任务：' + self.userEvent[name].name)
-        self.userEvent[name].status = 1
-        try:
-            self.userEvent[name].call(self)
-        except ZeroDivisionError as e:
-            self.userEvent[name].status = 2
-        self.userEvent[name].status = 0
+        event = self.userEvent[name]
+        if event.instance is None:
+            mhWindowLog('开始执行任务：' + event.EventThread.name)
+            event.instance = event.EventThread(self)
+            event.instance.start()
+            event.status = 1
 
     def getMousePosition(self):
         x, y = pyautogui.position()
@@ -177,5 +184,12 @@ class MHService:
 
 class MHEvent:
     name = None
-    call = None
-    status = 0
+    EventThread = None
+    instance = None
+    status = 0  # 0：停止 1：待执行 2： 执行中
+
+    def __init__(self, EventThread):
+        self.EventThread = EventThread
+        self.name = EventThread.name
+
+

@@ -50,11 +50,11 @@ class MHWindow(threading.Thread):
                     v.call(self)
             # 循环事件
             for k, v in self.userEvent.items():
-                if v.status == 2 and v.instance is not None:
+                if v.EventThread.status == 2 and v.instance is not None:
                     v.instance.raise_exception()
                     v.instance.join()
                     v.instance = None
-                    v.status = 0
+                    v.EventThread.status = 0
 
             time.sleep(1)
 
@@ -77,11 +77,15 @@ class MHWindow(threading.Thread):
 
     def doEvent(self, name):
         event = self.userEvent[name]
-        if event.instance is None:
+        if event.status == 0:
             mhWindowLog('开始执行任务：' + event.EventThread.name)
             event.instance = event.EventThread(self)
             event.instance.start()
-            event.status = 1
+            event.EventThread.status = 1
+
+    def stopEvent(self, name):
+        event = self.userEvent[name]
+        event.EventThread.status = 2
 
     def getMousePosition(self):
         x, y = pyautogui.position()
@@ -120,10 +124,12 @@ class MHWindow(threading.Thread):
 
     def resetMove(self):
         self.moveInWindow(self.width / 2, self.height / 2)
+        time.sleep(0.5)
         pyautogui.leftClick()
 
     def resetMove2(self):
         self.moveInWindow(self.width / 2, self.height / 3 * 2)
+        time.sleep(0.5)
         pyautogui.leftClick()
 
     def automaticPathfinding(self):
@@ -186,7 +192,6 @@ class MHEvent:
     name = None
     EventThread = None
     instance = None
-    status = 0  # 0：停止 1：待执行 2： 执行中
 
     def __init__(self, EventThread):
         self.EventThread = EventThread

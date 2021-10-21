@@ -16,6 +16,7 @@ class EventZgTask(threading.Thread):
         try:
             self.call()
         finally:
+            self.status = 2
             print('ended')
 
     def call(self):

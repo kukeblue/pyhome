@@ -44,7 +44,7 @@ async def startServiceTjJJHS(request):
 @app.route('/api/mh/stopServiceTjJJHS')
 async def stopServiceTjJJHS(request):
     myRobot.mhWindow.resetMove()
-    myRobot.mhWindow.userServices['zdJJHS'].status = 0
+    myRobot.mhWindow.stopEvent('zdJJHS')
     return json({'success': 'true'})
 
 

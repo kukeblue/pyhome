@@ -49,7 +49,7 @@ try:
         button7location = pyautogui.locateOnScreen('./images/meng.png')
         if button7location != None:
             print('进入打架')
-            time.sleep(0.5)
+            time.sleep(0.3)
             doFighting()
         else:
             print('等待打架')

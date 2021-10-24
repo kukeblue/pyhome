@@ -24,7 +24,7 @@ class EventZgTask(threading.Thread):
         isFighting = True
         while isFighting:
             time.sleep(1)
-            button7location = mhWindow.findImgInWindow('meng.png')
+            button7location = mhWindow.findImgInWindow('meng.png', confidence=0.85)
             if button7location is not None:
                 print('打架结束')
                 isFighting = False
@@ -54,19 +54,19 @@ class EventZgTask(threading.Thread):
                     if yz1 is not None:
                         yz = yz1
                         break
-                    yz2 = mhWindow.findImgInWindow('yz1.png')
+                    yz2 = mhWindow.findImgInWindow('yz2.png')
                     if yz2 is not None:
                         yz = yz2
                         break
-                    yz3 = mhWindow.findImgInWindow('yz1.png')
+                    yz3 = mhWindow.findImgInWindow('yz3.png')
                     if yz3 is not None:
                         yz = yz3
                         break
-                    yz4 = mhWindow.findImgInWindow('yz1.png')
+                    yz4 = mhWindow.findImgInWindow('yz4.png')
                     if yz4 is not None:
                         yz = yz4
                         break
-                    time.sleep(1)
+                    time.sleep(0.5)
                 if yz is not None:
                     print('-找到驿站老板')
                     mhWindow.pointMove(yz.left, yz.top)
@@ -76,11 +76,11 @@ class EventZgTask(threading.Thread):
                     mhWindow.findImgInWindowMultiple('yz_yes.png')
                     pyautogui.click()
 
-                time.sleep(0.5)
+                time.sleep(1)
 
                 print('-前往地府')
                 pyautogui.press('tab')
-                time.sleep(0.5)
+                time.sleep(0.3)
 
                 mhWindow.findImgInWindowMultiple('gj_df.png')
                 pyautogui.click(clicks=3)
@@ -88,29 +88,31 @@ class EventZgTask(threading.Thread):
                 pyautogui.press('tab')
 
                 print('-进入地府')
-                mhWindow.pointMove(467, 118)
+                pyautogui.press('f9')
+                time.sleep(0.3)
+                mhWindow.moveInWindow(487, 125)
                 pyautogui.click(clicks=2)
-                time.sleep(1)
+                time.sleep(1.5)
                 pyautogui.press('tab')
                 mhWindow.findImgInWindowMultiple('df_hwc.png')
                 pyautogui.click()
 
                 time.sleep(14)
 
-                mhWindow.pointMove(533, 510)
+                mhWindow.moveInWindow(533, 510)
                 pyautogui.click()
                 time.sleep(1.5)
                 pyautogui.press('f9')
 
                 mhWindow.findImgInWindowMultiple('df_hwc_2.png')
                 pyautogui.click(clicks=2)
-                time.sleep(0.5)
+                time.sleep(0.4)
                 mhWindow.findImgInWindowMultiple('df_hwc_yes.png')
                 pyautogui.click()
-                time.sleep(0.3)
-                pyautogui.click()
+                time.sleep(0.4)
+                pyautogui.click(clicks=2)
 
-                mhWindow.pointMove(386, 560)
+                mhWindow.moveInWindow(386, 560)
                 pyautogui.click(clicks=2)
                 time.sleep(2)
                 pyautogui.press('tab')

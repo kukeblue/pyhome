@@ -13,15 +13,15 @@ def findYZ():
     if yz1 != None:
         print('找到yz1')
         return yz1
-    yz2 = pyautogui.locateOnScreen('./images/yz1.png', confidence=0.5)
+    yz2 = pyautogui.locateOnScreen('./images/yz1.png', confidence=0.3)
     if yz2 != None:
         print('找到yz2')
         return yz2
-    yz3 = pyautogui.locateOnScreen('./images/yz1.png', confidence=0.5)
+    yz3 = pyautogui.locateOnScreen('./images/yz1.png', confidence=0.3)
     if yz3 != None:
         print('找到yz3')
         return yz3
-    yz4 = pyautogui.locateOnScreen('./images/yz1.png', confidence=0.5)
+    yz4 = pyautogui.locateOnScreen('./images/yz1.png', confidence=0.3)
     if yz4 != None:
         print('找到yz14')
         return yz4

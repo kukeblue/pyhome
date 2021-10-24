@@ -50,7 +50,7 @@ class MHWindow(threading.Thread):
                     v.call(self)
             # 循环事件
             for k, v in self.userEvent.items():
-                if v.EventThread.status == 2 and v.instance is not None:
+                if v.instance is not None and v.instance.status == 2:
                     v.instance.raise_exception()
                     v.instance.join()
                     v.instance = None
@@ -77,7 +77,7 @@ class MHWindow(threading.Thread):
 
     def doEvent(self, name):
         event = self.userEvent[name]
-        if event.status == 0:
+        if event.EventThread.status == 0:
             mhWindowLog('开始执行任务：' + event.EventThread.name)
             event.instance = event.EventThread(self)
             event.instance.start()
@@ -85,7 +85,7 @@ class MHWindow(threading.Thread):
 
     def stopEvent(self, name):
         event = self.userEvent[name]
-        event.EventThread.status = 2
+        event.instance.status = 2
 
     def getMousePosition(self):
         x, y = pyautogui.position()
@@ -114,7 +114,7 @@ class MHWindow(threading.Thread):
                 self.height = bottom - top
                 self.windowTopLocation = top
                 self.windowLeftLocation = left
-                self.region = (top, left, self.width,
+                self.region = (left, top, self.width,
                                self.height)
 
         win32gui.EnumWindows(get_all_hwnd, 0)
@@ -124,12 +124,14 @@ class MHWindow(threading.Thread):
 
     def resetMove(self):
         self.moveInWindow(self.width / 2, self.height / 2)
-        time.sleep(0.5)
+        time.sleep(0.3)
         pyautogui.leftClick()
 
     def resetMove2(self):
         self.moveInWindow(self.width / 2, self.height / 3 * 2)
-        time.sleep(0.5)
+        time.sleep(0.3)
+        pyautogui.leftClick()
+        time.sleep(0.1)
         pyautogui.leftClick()
 
     def automaticPathfinding(self):
@@ -150,7 +152,7 @@ class MHWindow(threading.Thread):
             image = self.findImgInWindow(path, confidence=0.7)
             if image is None:
                 print('图片查找失败， 进入异常倒计时！！！', errorCounter)
-                time.sleep(0.5)
+                time.sleep(0.3)
                 errorCounter = errorCounter + 1
                 if errorCounter == 10:
                     return image
@@ -173,7 +175,7 @@ class MHWindow(threading.Thread):
         while not finished:
             point = self.checkpoint()
             dx = point.left - 30
-            dy = point.top - 30
+            dy = point.top - 27
             if mx - dx > 2 or mx - dx < -2 or my - dy > 2 or my - dy < -2:
                 cx = mx - dx
                 cy = my - dy
@@ -198,3 +200,7 @@ class MHEvent:
         self.name = EventThread.name
 
 
+if __name__ == '__main__':
+    mhWindow = MHWindow()
+    mhWindow.start()
+    currentShot = pyautogui.screenshot(filePath + '\\..\\temp\\mh_window.png', mhWindow.region)

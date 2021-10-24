@@ -14,7 +14,7 @@ def doFighting():
     pyautogui.click() 
 
     
-    # by = pyautogui.locateOnScreen('./images/by.png', confidence=0.5)
+    # by = pyautogui.locateOnScreen('./images/by.png', confidence=0.3)
     by = None
     if by != None:
         print('找到by')
@@ -66,7 +66,7 @@ try:
         if button7location != None:
             print('进入打架')
             order = order + 1
-            time.sleep(0.5)
+            time.sleep(0.3)
             doFighting()
         else:
             print('等待打架')

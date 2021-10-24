@@ -37,11 +37,11 @@ def dozhuagui():
     pyautogui.hotkey('alt', 'e')
 
     ch_find.findYZ()
-    time.sleep(0.5)
+    time.sleep(0.3)
 
     print('-前往地府')
     pyautogui.press('tab')
-    time.sleep(0.5)
+    time.sleep(0.3)
     ch_find.findImage('../../../images/gj_df.png', check=True, confidence=0.8)
     pyautogui.click(clicks=3)
     time.sleep(18)
@@ -67,7 +67,7 @@ def dozhuagui():
 
     ch_find.findImage('../../../images/df_hwc_2.png', check=True)
     pyautogui.click(clicks=2)
-    time.sleep(0.5)
+    time.sleep(0.3)
     ch_find.findImage('../../../images/df_hwc_yes.png', check=True)
     pyautogui.click()
     time.sleep(0.3)

@@ -1,5 +1,5 @@
 from gwindow.mhWindow import MHWindow, MHEvent
-from gwindow.eventGetZgTask import EventZgTask
+from main.gwindow.event.eventGetZgTask import EventZgTask
 from gwindow.serviceTjJJHS import serviceTjJJHS
 
 

@@ -1,11 +1,12 @@
-import win32gui
 import threading
 import time
 import pyautogui
 import os
+import sys
+import re
 
 filePath = os.path.split(os.path.realpath(__file__))[0]
-imageDir = filePath + '\\..\\..\\images\\'
+imageDir = filePath + '/../../images/'
 
 
 def mhWindowLog(content):
@@ -13,11 +14,8 @@ def mhWindowLog(content):
 
 
 class MHWindow(threading.Thread):
-    hwnd = None
-    width = 0
     width = 0
     height = 0
-    windowTitle = ''
     windowLeftLocation = 0
     windowTopLocation = 0
     mouseX = 0
@@ -36,8 +34,8 @@ class MHWindow(threading.Thread):
     def run(self):
         while True:
             self.runTime = self.runTime + 1
-            self.getWindowInfo()
-            if self.windowTitle == '':
+            # self.getWindowInfo()
+            if self.region is None:
                 mhWindowLog('错误 - 未找到游戏窗口，进程休眠10秒')
                 time.sleep(10)
                 continue
@@ -99,25 +97,45 @@ class MHWindow(threading.Thread):
             self.isMouseOut = True
 
     def getWindowInfo(self):
-        def get_all_hwnd(hwnd, mouse):
-            if self.hwnd is None:
-                if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd):
-                    title = win32gui.GetWindowText(hwnd)
-                    if '梦幻西游' in title:
-                        win32gui.SetForegroundWindow(hwnd)
-                        self.hwnd = hwnd
-                        self.windowTitle = title
-
-            if self.hwnd:
-                left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
-                self.width = right - left
-                self.height = bottom - top
-                self.windowTopLocation = top
-                self.windowLeftLocation = left
-                self.region = (left, top, self.width,
-                               self.height)
-
-        win32gui.EnumWindows(get_all_hwnd, 0)
+        if sys.platform != "darwin":
+            import win32gui
+            def get_all_hwnd(hwnd, mouse):
+                if self.hwnd is None:
+                    if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd):
+                        title = win32gui.GetWindowText(hwnd)
+                        if '梦幻西游' in title:
+                            win32gui.SetForegroundWindow(hwnd)
+                            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+                            self.width = right - left
+                            self.height = bottom - top
+                            self.windowTopLocation = top
+                            self.windowLeftLocation = left
+                            self.region = (left, top, self.width,
+                                           self.height)
+            win32gui.EnumWindows(get_all_hwnd, 0)
+        else:
+            if sys.platform == "darwin":
+                from Quartz import (
+                    CGWindowListCopyWindowInfo,
+                    kCGWindowListOptionOnScreenOnly,
+                    kCGNullWindowID
+                )
+                options = kCGWindowListOptionOnScreenOnly
+                windowList = CGWindowListCopyWindowInfo(options, kCGNullWindowID)
+                for window in windowList:
+                    ownerName = window['kCGWindowOwnerName']
+                    windowName = '%s' % (ownerName)
+                    pre = re.compile(u'[\u4e00-\u9fa5]')
+                    res = re.findall(pre, windowName)
+                    res = ''.join(res)
+                    if res == '梦幻西游':
+                        geometry = window['kCGWindowBounds']
+                        self.width = int(geometry.get('Width'))
+                        self.height = int(geometry.get('Height'))
+                        self.windowTopLocation = int(geometry.get('Y'))
+                        self.windowLeftLocation = int(geometry.get('X'))
+                        self.region = (self.windowLeftLocation * 2,  self.windowTopLocation * 2, self.width * 2,
+                                       self.height * 2)
 
     def moveInWindow(self, x, y):
         pyautogui.moveTo(self.windowLeftLocation + x, self.windowTopLocation + y)
@@ -139,7 +157,8 @@ class MHWindow(threading.Thread):
         pyautogui.press('tab')
 
     def windowShot(self):
-        self.currentShot = pyautogui.screenshot(filePath + '\\..\\temp\\mh_window.png', self.region)
+        newRegion =(self.region[0], self.region[1], self.region[2], self.region[3])
+        self.currentShot = pyautogui.screenshot('./temp/mh_window.png', newRegion)
 
     def findImgInWindow(self, path, confidence=0.75):
         location = pyautogui.locateOnScreen(imageDir + path, region=self.region, confidence=confidence)

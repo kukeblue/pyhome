@@ -2,17 +2,15 @@ import time
 from sanic import Sanic
 from sanic.response import json
 from robot import Robot
-from orjson import dumps
+from cnocr import CnOcr
+from cnstd import CnStd
+import pyautogui
 
-app = Sanic("My Hello, world app", dumps=dumps)
+app = Sanic("My Hello, world app")
 app.static('/', '../static')
+app.static('/', '../static/index.html')
 myRobot = Robot()
 myRobot.start()
-
-
-@app.route('/api/test')
-async def test(request):
-    return json({'hello': 'world'})
 
 
 @app.route('/api/mh/windowShot')
@@ -58,7 +56,34 @@ async def getTaskAndEventStatus(request):
 
     return json({'list': result})
 
+@app.route('/api/test')
+async def test(request):
+    print('test')
+    # myRobot.mhWindow.windowShot()
+    std = CnStd()
+    cn_ocr = CnOcr(cand_alphabet='的签到答题')
+    box_infos = std.detect('temp/1.png')
+    for box_info in box_infos['detected_texts']:
+        cropped_img = box_info['cropped_img']
+        ocr_res = cn_ocr.ocr_for_single_line(cropped_img)
+        print('ocr result: %s' % str(ocr_res))
+    return json({'success': True})
+
+@app.route('/test')
+async def test(request):
+    print('test')
+    # myRobot.mhWindow.windowShot()
+    std = CnStd()
+    cn_ocr = CnOcr(cand_alphabet='的签到答题')
+    box_infos = std.detect('temp/1.png')
+    for box_info in box_infos['detected_texts']:
+        cropped_img = box_info['cropped_img']
+        ocr_res = cn_ocr.ocr_for_single_line(cropped_img)
+        print('ocr result: %s' % str(ocr_res))
+    return json({'success': True})
+
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=False, access_log=False)
+    app.run(debug=False, access_log=False)
 

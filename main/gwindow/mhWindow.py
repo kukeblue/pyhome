@@ -26,6 +26,7 @@ class MHWindow(threading.Thread):
     runTime = 0
     currentShot = None  # 当前快照
     region = None
+    battleCount = 0
 
     def __init__(self):
         self.getWindowInfo()
@@ -44,16 +45,21 @@ class MHWindow(threading.Thread):
                 if v.status == 1:
                     print('注册' + v.name + '服务')
                     v.status = 2
-                if v.status == 2:
+                if v.status > 1:
                     v.call(self)
-            # 循环事件
+            # 循环事件c
             for k, v in self.userEvent.items():
-                if v.instance is not None and v.instance.status == 2:
+                print(v.name)
+                print(v.instance)
+                if v.instance is not None:
+                    print(v.instance.status)
+                if v.instance is not None and v.instance.status == -1:
+                    print(v.instance.status)
+                    v.instance.status = 0
                     v.instance.raise_exception()
                     v.instance.join()
                     v.instance = None
                     v.EventThread.status = 0
-
             time.sleep(1)
 
     # 注册服务
@@ -81,6 +87,7 @@ class MHWindow(threading.Thread):
             event.instance.start()
             event.EventThread.status = 1
 
+
     def stopEvent(self, name):
         event = self.userEvent[name]
         event.instance.status = 2
@@ -100,18 +107,17 @@ class MHWindow(threading.Thread):
         if sys.platform != "darwin":
             import win32gui
             def get_all_hwnd(hwnd, mouse):
-                if self.hwnd is None:
-                    if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd):
-                        title = win32gui.GetWindowText(hwnd)
-                        if '梦幻西游' in title:
-                            win32gui.SetForegroundWindow(hwnd)
-                            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-                            self.width = right - left
-                            self.height = bottom - top
-                            self.windowTopLocation = top
-                            self.windowLeftLocation = left
-                            self.region = (left, top, self.width,
-                                           self.height)
+                if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd):
+                    title = win32gui.GetWindowText(hwnd)
+                    if '梦幻西游' in title:
+                        win32gui.SetForegroundWindow(hwnd)
+                        left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+                        self.width = right - left
+                        self.height = bottom - top
+                        self.windowTopLocation = top
+                        self.windowLeftLocation = left
+                        self.region = (left, top, self.width,
+                                       self.height)
             win32gui.EnumWindows(get_all_hwnd, 0)
         else:
             if sys.platform == "darwin":
@@ -152,6 +158,13 @@ class MHWindow(threading.Thread):
         time.sleep(0.1)
         pyautogui.leftClick()
 
+    def resetMove3(self):
+        self.moveInWindow(self.width / 2, self.height / 2)
+        time.sleep(2)
+
+    def resetMove4(self):
+        self.moveInWindow(self.width / 2, self.height / 1.4)
+
     def automaticPathfinding(self):
         self.resetMove()
         pyautogui.press('tab')
@@ -159,6 +172,10 @@ class MHWindow(threading.Thread):
     def windowShot(self):
         newRegion =(self.region[0], self.region[1], self.region[2], self.region[3])
         self.currentShot = pyautogui.screenshot('./temp/mh_window.png', newRegion)
+
+    def findImgInWindow(self, path, confidence=0.75):
+        location = pyautogui.locateOnScreen(imageDir + path, region=self.region, confidence=confidence)
+        return location
 
     def findImgInWindow(self, path, confidence=0.75):
         location = pyautogui.locateOnScreen(imageDir + path, region=self.region, confidence=confidence)
@@ -182,10 +199,10 @@ class MHWindow(threading.Thread):
     def checkpoint(self):
         point = self.findImgInWindow('jiantou.png')
         if point is None:
-            self.resetMove()
+            self.resetMove3()
             point = self.findImgInWindow('jiantou.png')
         if point is None:
-            self.resetMove()
+            self.resetMove3()
             point = self.findImgInWindow('jiantou.png')
         return point
 
@@ -218,8 +235,6 @@ class MHEvent:
         self.EventThread = EventThread
         self.name = EventThread.name
 
-
-if __name__ == '__main__':
-    mhWindow = MHWindow()
-    mhWindow.start()
-    currentShot = pyautogui.screenshot(filePath + '\\..\\temp\\mh_window.png', mhWindow.region)
+# if __name__ == '__main__':
+#     song = AudioSegment.from_wav('D:/project/pyhome/images/14430.wav')
+#     play(song)

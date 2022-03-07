@@ -2,7 +2,11 @@ import pyautogui
 import time
 import threading
 import ctypes
+import os
 
+
+from pydub import AudioSegment
+from pydub.playback import play
 
 class EventZgTask(threading.Thread):
     name = '领取抓鬼任务'
@@ -17,7 +21,7 @@ class EventZgTask(threading.Thread):
         try:
             self.call()
         finally:
-            self.status = 2
+            self.status = -1
             print('ended')
 
     def call(self):
@@ -81,7 +85,7 @@ class EventZgTask(threading.Thread):
 
                 print('-前往地府')
                 pyautogui.press('tab')
-                time.sleep(0.3)
+                time.sleep(0.5)
 
                 mhWindow.findImgInWindowMultiple('gj_df.png')
                 pyautogui.click(clicks=3)
@@ -91,43 +95,54 @@ class EventZgTask(threading.Thread):
                 print('-进入地府')
                 pyautogui.press('f9')
                 time.sleep(0.3)
-                mhWindow.moveInWindow(487, 125)
+                mhWindow.findImgInWindowMultiple('df_mk.png')
                 pyautogui.click(clicks=2)
                 time.sleep(1.5)
-                pyautogui.press('tab')
-                mhWindow.findImgInWindowMultiple('df_hwc.png')
-                pyautogui.click()
+                if self.status == 1:
+                    pyautogui.press('tab')
+                    mhWindow.findImgInWindowMultiple('df_hwc.png')
+                    pyautogui.click()
 
-                time.sleep(14)
+                    time.sleep(14)
 
-                mhWindow.moveInWindow(533, 510)
-                pyautogui.click()
-                time.sleep(1.5)
-                pyautogui.press('f9')
+                    mhWindow.moveInWindow(533, 510)
+                    pyautogui.click()
+                    time.sleep(1.5)
+                    pyautogui.press('f9')
 
-                mhWindow.findImgInWindowMultiple('df_hwc_2.png')
-                pyautogui.click(clicks=2)
-                time.sleep(0.4)
-                mhWindow.findImgInWindowMultiple('df_hwc_yes.png')
-                pyautogui.click()
-                time.sleep(0.4)
-                pyautogui.click(clicks=2)
+                    mhWindow.findImgInWindowMultiple('df_hwc_2.png')
+                    pyautogui.click(clicks=2)
+                    time.sleep(0.4)
+                    mhWindow.findImgInWindowMultiple('df_hwc_yes.png')
+                    pyautogui.click()
+                    time.sleep(0.4)
+                    pyautogui.click()
+                    pyautogui.click()
 
-                mhWindow.moveInWindow(386, 560)
-                pyautogui.click(clicks=2)
-                time.sleep(2)
+                    mhWindow.moveInWindow(386, 560)
+                    pyautogui.click(clicks=2)
+                    time.sleep(2)
                 pyautogui.press('tab')
                 time.sleep(0.3)
-                mhWindow.findImgInWindowMultiple('df_zd.png')
+                df_zd = mhWindow.findImgInWindow('df_zd.png')
+                if df_zd is not None:
+                    mhWindow.findImgInWindowMultiple('df_zd.png')
+                else:
+                    mhWindow.findImgInWindowMultiple('df_zd2.png')
                 pyautogui.click()
+                time.sleep(13)
+                self.status = -1
+                print('ended')
+                os.system('D:/project/pyhome/images/14430.wav')
+                # time.sleep(3)
+                # pyautogui.press('f9')
 
-                pyautogui.press('tab')
-                time.sleep(15)
-                pyautogui.press('f9')
-                mhWindow.findImgInWindowMultiple('df_zd_2.png')
-                pyautogui.click()
-                mhWindow.findImgInWindowMultiple('df_zd_yes.png')
-                pyautogui.click()
+                # os.system(‘mpg123’+ file)
+                # song = AudioSegment.from_wav(')
+                # mhWindow.findImgInWindowMultiple('df_zd_2.png')
+                # pyautogui.click()
+                # mhWindow.findImgInWindowMultiple('df_zd_yes.png')
+                # pyautogui.click()
 
     def get_id(self):
         # returns id of the respective thread
@@ -139,12 +154,13 @@ class EventZgTask(threading.Thread):
 
     def raise_exception(self):
         thread_id = self.get_id()
-        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id,
-                                                         ctypes.py_object(SystemExit))
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, ctypes.py_object(SystemExit))
         if res > 1:
             ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
             print('Exception raise failure')
 
+if __name__ == '__main__':
+    os.system('D:/project/pyhome/images/14430.wav')
 
 
 

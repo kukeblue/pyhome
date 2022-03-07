@@ -22,13 +22,24 @@ async def test(request):
 
 @app.route('/api/mh/getZgTask')
 async def getZgTask(request):
-    myRobot.mhWindow.resetMove()
-    myRobot.mhWindow.doEvent('zgTask')
+
+    if myRobot.mhWindow.userEvent.get('zgTask').instance is not None:
+        if myRobot.mhWindow.userEvent.get('zgTask').instance.status == 1:
+            myRobot.mhWindow.userEvent.get('zgTask').instance.status = 2
+        if myRobot.mhWindow.userEvent.get('zgTask').instance.status == -1:
+            myRobot.mhWindow.userEvent.get('zgTask').instance.status = 2
+    else:
+        myRobot.mhWindow.resetMove2()
+        myRobot.mhWindow.doEvent('zgTask')
+        myRobot.mhWindow.userEvent.get('zgTask').instance.status = 2
     return json({'success': 'true'})
+
 
 @app.route('/api/mh/stopZgTask')
 async def stopZgTask(request):
-    myRobot.mhWindow.userEvent.get('zgTask').instance.status = 2
+    if myRobot.mhWindow.userEvent.get('zgTask').instance is not None:
+        myRobot.mhWindow.userEvent.get('zgTask').instance.status = -1
+
     return json({'success': 'true'})
 
 
@@ -45,6 +56,14 @@ async def stopServiceTjJJHS(request):
     myRobot.mhWindow.stopService('zdJJHS')
     return json({'success': 'true'})
 
+@app.route('/api/mh/serviceTjMSZY')
+async def stopServiceTjJJHS(request):
+    if  myRobot.mhWindow.userServices['zdMSZY'].status == 0:
+        myRobot.mhWindow.userServices['zdMSZY'].status = 1
+    else:
+        myRobot.mhWindow.userServices['zdMSZY'].status = 0
+    return json({'success': 'true'})
+
 
 @app.route('/api/mh/getTaskAndEventStatus')
 async def getTaskAndEventStatus(request):
@@ -52,9 +71,14 @@ async def getTaskAndEventStatus(request):
     for k, v in myRobot.mhWindow.userServices.items():
         result.append({'name': v.name, 'status': v.status, 'type': 'service'})
     for k, v in myRobot.mhWindow.userEvent.items():
-        result.append({'name': v.name, 'status': v.instance.status if v.instance is not None else 0, 'type': 'event'})
+        status = 0
+        if v.instance is not None and v.instance.status > 0:
+            status = v.instance.status
+
+        result.append({'name': v.name, 'status': status, 'type': 'event'})
 
     return json({'list': result})
+
 
 @app.route('/api/test')
 async def test(request):
@@ -68,6 +92,7 @@ async def test(request):
         ocr_res = cn_ocr.ocr_for_single_line(cropped_img)
         print('ocr result: %s' % str(ocr_res))
     return json({'success': True})
+
 
 @app.route('/test')
 async def test(request):
@@ -83,7 +108,5 @@ async def test(request):
     return json({'success': True})
 
 
-
 if __name__ == '__main__':
     app.run(debug=False, access_log=False)
-

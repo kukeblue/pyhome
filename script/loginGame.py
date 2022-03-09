@@ -1,3 +1,4 @@
+# coding:utf-8
 import time
 from win32com.client import Dispatch
 import win32api
@@ -12,7 +13,7 @@ def login(accounts):
                           r'C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\梦幻西游',
                           '', '', 1)
     while True:
-        print('info:启动游戏')
+        print('login game start')
         time.sleep(1)
         hwnd = op.findWindow('', '梦幻西游 ONLINE')
         if hwnd is not None and hwnd != 0:
@@ -24,12 +25,15 @@ def login(accounts):
                 time.sleep(1)
                 op.LeftClick()
             break
+        else:
+             print('not find window')
+             return
     for index in range(len(accounts)):
         account = accounts[index]
         while True:
             time.sleep(1)
             # 点击下一步
-            print('info:点击下一步')
+            print('info:click next')
             ret2 = op.FindMultiColor(1282, 844, 1416, 899, 'c0d8f0-993d27', '0|-1|c0d8f0', 0.95, 0)
             if ret2[0] > 0:
                 op.MoveTo(1352, 871)
@@ -39,18 +43,18 @@ def login(accounts):
 
         while True:
             time.sleep(1)
-            print('info:普通登录')
+            print('info:click login')
             ret2 = op.FindColor(899, 516, 994, 543, 'd8d8a8-993d27', 0.95, 0)
             if ret2[0] > 0:
-                print('info:点击密码框')
+                print('info:enter username')
                 op.MoveTo(1035, 599)
                 op.LeftClick()
-                print('info:删除原先密码')
+                print('info:delete old username')
                 for num in range(0, 20):
                     op.KeyPress('37')
                 for num in range(0, 20):
                     op.KeyPress('46')
-                print('info:输入新密码')
+                print('info:enter new username')
                 utils.writeText(account["username"])
                 time.sleep(1)
                 op.MoveTo(1045, 629)
@@ -63,7 +67,7 @@ def login(accounts):
                 break
 
         while True:
-            print('info:点击一下布')
+            print('info:click next button')
             time.sleep(1)
             op.LeftClick()
             ret2 = op.FindColor(1281, 842, 1408, 898, 'c8d0d0-993d27', 0.95, 0)
@@ -73,7 +77,7 @@ def login(accounts):
                 break
 
         while True:
-            print('info:点击进入游戏')
+            print('info:click enter game')
             time.sleep(1)
             ret2 = op.FindMultiColor(671, 836, 735, 864, 'a0b0d0-993d27', '2|6|90a4d0,4|0|8898b8', 0.95, 0)
             if ret2[0] > 0:
@@ -85,7 +89,7 @@ def login(accounts):
                 break
 
         while True:
-            print('info:输入将军令')
+            print('info:enter code')
             time.sleep(1)
             code = utils.getGameVerificationCode()
             if code is not None:
@@ -95,21 +99,21 @@ def login(accounts):
                 break
 
         while True:
-            print('判断是否登录成功')
+            print('is login success?')
             time.sleep(1)
             ret2 = op.FindColor(641, 340, 657, 355, '185878-993d27|084060-000000|78e4e0-000000', 0.90, 0)
             if ret2[0] > 0:
-                print('登录成功！')
+                print('login success！')
                 break
 
         if index + 1 != len(accounts):
-            print('登录下一个号')
+            print('next account')
             ret2 = op.FindMultiColor(771, 297, 1444, 319, '3e5c72-993d27', '0|-4|3f6d8e,3|-3|9cb0c5', 0.95, 0)
             if ret2[0] > 0:
                 op.MoveTo(ret2[1], ret2[2])
                 op.LeftClick()
             else:
-                print('全部登录完成')
+                print('finish')
 
 
 accountMap = {
@@ -128,8 +132,9 @@ accountMap = {
 if __name__ == "__main__":
     args = sys.argv[1:]
     print(args)
+    print(len(args))
     Accounts = []
     for index in range(len(args)):
-        Accounts.append({"username": args[index], "password": accountMap[args[index]]})
+       Accounts.append({"username": args[index], "password": accountMap[args[index]]})
     print(Accounts)
     login(Accounts)

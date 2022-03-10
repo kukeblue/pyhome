@@ -10,8 +10,7 @@ def getGameVerificationCode():
         hwnd = op.findWindow('', '乾坤辅助平台')
         ret = op.bindWindow(hwnd, "normal", "normal", "normal", 0)
         print(ret)
-        op_ret = op.Capture(120, 250, 330, 283, "screen.bmp")
-        s = op.ocr(120, 250, 330, 283, "000000-993d27|000000-000000", 0.9)
+        op.Capture(140, 180, 350, 223, "screen.bmp")
         baiduRetStr = baiduApi.getImageText('screen.bmp')
         print(baiduRetStr['words_result'])
         verificationCode = ''
@@ -22,3 +21,4 @@ def getGameVerificationCode():
     except IOError:
         print(0)
         return 0
+

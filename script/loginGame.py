@@ -4,6 +4,8 @@ from win32com.client import Dispatch
 import win32api
 import utils
 import sys
+import os
+import logUtil
 
 op = Dispatch("op.opsoft")
 
@@ -13,48 +15,48 @@ def login(accounts):
                           r'C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\梦幻西游',
                           '', '', 1)
     while True:
-        print('login game start')
+        logUtil.chLog('login game start')
         time.sleep(1)
         hwnd = op.findWindow('', '梦幻西游 ONLINE')
         if hwnd is not None and hwnd != 0:
             time.sleep(3)
             ret = op.FindMultiColor(1157, 681, 1245, 760, '5f26a0-993d27', '7|0|5e229e', 0.95, 0)
-            print(ret)
+            logUtil.chLog(ret)
             if ret[0] > 0:
                 op.MoveTo(1208, 724)
                 time.sleep(1)
                 op.LeftClick()
             break
         else:
-             print('not find window')
+             logUtil.chLog('not find window')
              return
     for index in range(len(accounts)):
         account = accounts[index]
         while True:
             time.sleep(1)
             # 点击下一步
-            print('info:click next')
+            logUtil.chLog('info:click next')
             ret2 = op.FindMultiColor(1282, 844, 1416, 899, 'c0d8f0-993d27', '0|-1|c0d8f0', 0.95, 0)
             if ret2[0] > 0:
                 op.MoveTo(1352, 871)
-                time.sleep(1)
+                time.sleep(3)
                 op.LeftClick()
                 break
 
         while True:
             time.sleep(1)
-            print('info:click login')
+            logUtil.chLog('info:click login')
             ret2 = op.FindColor(899, 516, 994, 543, 'd8d8a8-993d27', 0.95, 0)
             if ret2[0] > 0:
-                print('info:enter username')
+                logUtil.chLog('info:enter username')
                 op.MoveTo(1035, 599)
                 op.LeftClick()
-                print('info:delete old username')
+                logUtil.chLog('info:delete old username')
                 for num in range(0, 20):
                     op.KeyPress('37')
                 for num in range(0, 20):
                     op.KeyPress('46')
-                print('info:enter new username')
+                logUtil.chLog('info:enter new username')
                 utils.writeText(account["username"])
                 time.sleep(1)
                 op.MoveTo(1045, 629)
@@ -67,7 +69,7 @@ def login(accounts):
                 break
 
         while True:
-            print('info:click next button')
+            logUtil.chLog('info:click next button')
             time.sleep(1)
             op.LeftClick()
             ret2 = op.FindColor(1281, 842, 1408, 898, 'c8d0d0-993d27', 0.95, 0)
@@ -77,7 +79,7 @@ def login(accounts):
                 break
 
         while True:
-            print('info:click enter game')
+            logUtil.chLog('info:click enter game')
             time.sleep(1)
             ret2 = op.FindMultiColor(671, 836, 735, 864, 'a0b0d0-993d27', '2|6|90a4d0,4|0|8898b8', 0.95, 0)
             if ret2[0] > 0:
@@ -89,7 +91,7 @@ def login(accounts):
                 break
 
         while True:
-            print('info:enter code')
+            logUtil.chLog('info:enter code')
             time.sleep(1)
             code = utils.getGameVerificationCode()
             if code is not None:
@@ -99,21 +101,21 @@ def login(accounts):
                 break
 
         while True:
-            print('is login success?')
+            logUtil.chLog('is login success?')
             time.sleep(1)
             ret2 = op.FindColor(641, 340, 657, 355, '185878-993d27|084060-000000|78e4e0-000000', 0.90, 0)
             if ret2[0] > 0:
-                print('login success！')
+                logUtil.chLog('login success！')
                 break
 
         if index + 1 != len(accounts):
-            print('next account')
+            logUtil.chLog('next account')
             ret2 = op.FindMultiColor(771, 297, 1444, 319, '3e5c72-993d27', '0|-4|3f6d8e,3|-3|9cb0c5', 0.95, 0)
             if ret2[0] > 0:
                 op.MoveTo(ret2[1], ret2[2])
                 op.LeftClick()
             else:
-                print('finish')
+                logUtil.chLog('finish')
 
 
 accountMap = {
@@ -130,11 +132,15 @@ accountMap = {
 }
 
 if __name__ == "__main__":
+    pid = os.getpid()
+    logUtil.chLog('pythonPid|loginGame|' + str(pid))
     args = sys.argv[1:]
-    print(args)
-    print(len(args))
+    logUtil.chLog(args)
+    logUtil.chLog(len(args))
     Accounts = []
     for index in range(len(args)):
-       Accounts.append({"username": args[index], "password": accountMap[args[index]]})
-    print(Accounts)
+       username = args[index][:-8]
+       Accounts.append({"username": username, "password": accountMap[username]})
+
+    logUtil.chLog(Accounts)
     login(Accounts)
